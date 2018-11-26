@@ -1,0 +1,12 @@
+[Unit]
+Description=Prometheus Server
+Documentation=https://prometheus.io/docs/introduction/overview/
+After=network-online.target
+
+[Service]
+User=root
+Restart=on-failure
+ExecStart=/opt/prometheus/prometheus --config.file=/monitor/prometheus/prometheus.yml --storage.tsdb.path=/monitor/prometheus/data/
+
+[Install]
+WantedBy=multi-user.target

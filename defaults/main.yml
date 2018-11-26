@@ -1,0 +1,24 @@
+# Prometheus version
+prometheus_version: 2.4.3
+prometheus_download_url: https://github.com/prometheus/prometheus/releases/download/v2.4.3
+
+# Prometheus environment config
+prometheus_root_dir: /monitor/prometheus
+prometheus_config_file: "{{ prometheus_root_dir }}/prometheus.yml"
+prometheus_tsdb_loc: "{{ prometheus_root_dir }}/data"
+
+# Grafana version
+grafana_version: 5.3.0
+grafana_download_url: https://s3-us-west-2.amazonaws.com/grafana-releases/release
+
+# Grafana environment config
+grafana_user: grafana
+grafana_group: grafana
+grafana_root_dir: /monitor/grafana
+grafana_log_dir: /var/log/grafana
+grafana_data_dir: /var/lib/grafana
+grafana_max_open_files: 10000
+grafana_conf_dir: "{{ grafana_root_dir }}/etc"
+grafana_conf_file: "{{ grafana_conf_dir }}/grafana.ini"
+grafana_plugins_dir: "{{ grafana_data_dir }}/plugins"
+grafana_provision_dir: "{{ grafana_conf_dir }}/provisioning"

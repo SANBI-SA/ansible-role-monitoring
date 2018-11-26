@@ -1,0 +1,4 @@
+---
+
+- include_tasks: 01_server.yml
+  run_once: True
