@@ -5,10 +5,6 @@
  
 #- name: Ensure mount exists
 
-- name: Install Prometheus
-  block:
-  - name: Download prometheus binary
-
 - name: Install Grafana
   block:
   - name: Install Grafana dependencies
@@ -20,7 +16,7 @@
       - fontconfig-config
       - libfontconfig
 
-  - name: Install Grafana package with package manager
+  - name: Install Grafana
     apt:
       deb: "{{ grafana_download_url }}/grafana_{{ grafana_version }}_{{ arch_mapping[ansible_architecture] }}.deb"
 
@@ -50,8 +46,8 @@
         path: "{{item.item}}"
         state: directory
         mode: 0755
-        group: root
-        owner: root
+        group: grafana
+        owner: grafana
         when: item.stat.exists == false
         loop: "{{folder_stats.results}}"
 
