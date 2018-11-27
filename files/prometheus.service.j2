@@ -6,7 +6,7 @@ After=network-online.target
 [Service]
 User=root
 Restart=on-failure
-ExecStart=/opt/prometheus/prometheus --config.file=/monitor/prometheus/prometheus.yml --storage.tsdb.path=/monitor/prometheus/data/
+ExecStart=/opt/prometheus/prometheus --config.file={{ prometheus_config_file }} --storage.tsdb.path={{ prometheus_tsdb_loc }}/
 
 [Install]
 WantedBy=multi-user.target
