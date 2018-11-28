@@ -1,0 +1,4 @@
+---
+
+- include_tasks: 01_server.yml
+  when: monitor_server is defined

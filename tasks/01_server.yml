@@ -1,0 +1,91 @@
+---
+
+- name: Include server vars
+  include_vars: "server.yml"
+ 
+#- name: Ensure mount exists
+
+- name: Install Grafana
+  block:
+    - name: Install Grafana dependencies
+      apt:
+        name: "{{ item }}"
+        state: present  
+      loop:
+        - fonts-dejavu-core
+        - fontconfig-config
+        - libfontconfig
+
+    - name: Install Grafana
+      apt:
+        deb: "{{ grafana_download_url }}/grafana_{{ grafana_version }}_{{ grafana_arch_mapping[ansible_architecture] }}.deb"
+
+    - name: Template environment file
+      template:
+        src: "{{ role_path }}/files/environment.j2"
+        dest: "/etc/default/grafana-server"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: "Creating multiple by checking folders"
+      block:
+        - name: "Checking folders"
+          stat:
+            path: "{{item}}"
+          register: folder_stats
+          loop:
+            - "{{ grafana_root_dir }}"
+            - "{{ grafana_log_dir }}"
+            - "{{ grafana_data_dir }}"
+            - "{{ grafana_conf_dir }}"
+            - "{{ grafana_plugins_dir }}"
+            - "{{ grafana_provision_dir }}"
+        - name: "Creating multiple folders without disturbing previous permissions"
+          file:
+            path: "{{item.item}}"
+            state: directory
+            mode: 0755
+            group: grafana
+            owner: grafana
+          when: item.stat.exists == false
+          loop: "{{folder_stats.results}}"
+
+- name: Start service grafana-server
+  systemd:
+    name: grafana-server
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+
+- name: Install Prometheus
+  block:
+    - name: Check that prometheus isn't already installed
+      stat:
+        path: /opt/prometheus/prometheus
+      register: stat_result
+
+    - block: 
+      - name: Grab Prometheus binary
+        unarchive:
+          src: "{{ prometheus_download_url }}"
+          dest: /opt/
+          remote_src: yes
+      - name: Rename and move prometheus directory
+        command: "mv /opt/prometheus-{{ prometheus_version }}.linux-amd64 /opt/prometheus"
+      when: stat_result.stat.exists == False
+
+- name: Template out the service file for prometheus
+  template:
+    src: "{{ role_path }}/files/prometheus.service.j2"
+    dest: "/etc/systemd/system/prometheus.service"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Start service prometheus
+  systemd:
+    name: prometheus
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
